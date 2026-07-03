@@ -127,6 +127,31 @@ export class PaddleOcrService {
     return this.groupResult(recognition);
   }
 
+  getEncompassingBox(words) {
+    if (!words || words.length === 0) return { x: 0, y: 0, width: 0, height: 0 };
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const word of words) {
+      const box = word.box;
+      if (box) {
+        minX = Math.min(minX, box.x);
+        minY = Math.min(minY, box.y);
+        maxX = Math.max(maxX, box.x + box.width);
+        maxY = Math.max(maxY, box.y + box.height);
+      }
+    }
+
+    return {
+      x: minX === Infinity ? 0 : minX,
+      y: minY === Infinity ? 0 : minY,
+      width: maxX === -Infinity ? 0 : (maxX - minX),
+      height: maxY === -Infinity ? 0 : (maxY - minY)
+    };
+  }
+
   groupResult(recognition) {
     let result = { text: "", lines: [] };
     if (!recognition.length) {
@@ -147,14 +172,26 @@ export class PaddleOcrService {
         fullText += ` ${current.text}`;
         avgHeight = currentLine.reduce((sum, r) => sum + r.box.height, 0) / currentLine.length;
       } else {
-        result.lines.push([...currentLine]);
+        const lineText = currentLine.map(w => w.text).join(' ');
+        const lineBox = this.getEncompassingBox(currentLine);
+        result.lines.push({
+          text: lineText,
+          box: lineBox,
+          words: [...currentLine]
+        });
         fullText += `\n${current.text}`;
         currentLine = [current];
         avgHeight = current.box.height;
       }
     }
     if (currentLine.length > 0) {
-      result.lines.push([...currentLine]);
+      const lineText = currentLine.map(w => w.text).join(' ');
+      const lineBox = this.getEncompassingBox(currentLine);
+      result.lines.push({
+        text: lineText,
+        box: lineBox,
+        words: [...currentLine]
+      });
     }
     result.text = fullText;
     return result;
