@@ -4,3 +4,6 @@ jobs_db.json
 .env
 models/
 *.log
+jobs.db*
+test.png
+
