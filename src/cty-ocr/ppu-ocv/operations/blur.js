@@ -1,0 +1,1 @@
+import{cv,registry}from"../index.js";function defaultOptions(){return{size:[5,5],sigma:0}}export function blur(img,options){let imgBlur=new cv.Mat;cv.GaussianBlur(img,imgBlur,new cv.Size(options.size[0],options.size[1]),options.sigma);img.delete();return{img:imgBlur,width:imgBlur.cols,height:imgBlur.rows}}registry.register("blur",blur,defaultOptions);

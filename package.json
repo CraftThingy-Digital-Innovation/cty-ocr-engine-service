@@ -16,7 +16,7 @@
     "pdfjs-dist": "^4.3.136",
     "pdftoimg-js": "^0.2.5",
     "onnxruntime-node": "^1.18.0",
-    "ppu-paddle-ocr": "^1.0.8",
+    "@techstark/opencv-js": "^4.10.0-release.1",
     "uuid": "^9.0.1"
   }
 }

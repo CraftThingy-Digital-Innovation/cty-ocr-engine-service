@@ -1,42 +1,82 @@
-import { PaddleOcrService } from 'ppu-paddle-ocr';
+import { PaddleOcrService } from './cty-ocr/index.js';
+import path from 'path';
 
-let ocrServiceInstance = null;
-let isInitializing = false;
-let initPromise = null;
+let ocrServiceV3 = null;
+let ocrServiceV6 = null;
+let isInitializingV3 = false;
+let isInitializingV6 = false;
+let initPromiseV3 = null;
+let initPromiseV6 = null;
 
 /**
- * Initializes and warms up the singleton PaddleOCR Service.
- * Downloads the models automatically on first execution and caches them.
+ * Initializes and warms up the singleton PaddleOCR Service for the selected model.
+ * @param {string} model 'v3' | 'v6'
  */
-export async function initOcrService() {
-  if (ocrServiceInstance) return ocrServiceInstance;
+export async function initOcrService(model = 'v3') {
+  if (model === 'v6') {
+    if (ocrServiceV6) return ocrServiceV6;
+    if (isInitializingV6) return initPromiseV6;
 
-  if (isInitializing) {
-    return initPromise;
+    isInitializingV6 = true;
+    initPromiseV6 = (async () => {
+      console.log('Initializing PaddleOCR Service for PP-OCRv6...');
+      try {
+        const modelsPath = path.resolve('../php-ocr-application-test/public/models');
+        const service = new PaddleOcrService({
+          model: {
+            detection: path.join(modelsPath, 'PP-OCRv6_medium_det.onnx'),
+            recognition: path.join(modelsPath, 'PP-OCRv6_medium_rec.onnx'),
+            charactersDictionary: path.join(modelsPath, 'ppocrv6_dict.txt')
+          },
+          detection: {
+            maxSideLength: 2000
+          }
+        });
+        await service.initialize();
+        ocrServiceV6 = service;
+        console.log('PaddleOCR Service V6 successfully initialized and warmed up.');
+        return ocrServiceV6;
+      } catch (error) {
+        console.error('Failed to initialize PaddleOCR Service V6:', error);
+        isInitializingV6 = false;
+        initPromiseV6 = null;
+        throw error;
+      }
+    })();
+    return initPromiseV6;
+  } else {
+    // PP-OCRv3 Default
+    if (ocrServiceV3) return ocrServiceV3;
+    if (isInitializingV3) return initPromiseV3;
+
+    isInitializingV3 = true;
+    initPromiseV3 = (async () => {
+      console.log('Initializing PaddleOCR Service for PP-OCRv3...');
+      try {
+        const modelsPath = path.resolve('../php-ocr-application-test/public/models');
+        const service = new PaddleOcrService({
+          model: {
+            detection: path.join(modelsPath, 'en_PP-OCRv3_det_infer.onnx'),
+            recognition: path.join(modelsPath, 'en_PP-OCRv3_rec_infer.onnx'),
+            charactersDictionary: path.join(modelsPath, 'en_dict.txt')
+          },
+          detection: {
+            maxSideLength: 2000
+          }
+        });
+        await service.initialize();
+        ocrServiceV3 = service;
+        console.log('PaddleOCR Service V3 successfully initialized and warmed up.');
+        return ocrServiceV3;
+      } catch (error) {
+        console.error('Failed to initialize PaddleOCR Service V3:', error);
+        isInitializingV3 = false;
+        initPromiseV3 = null;
+        throw error;
+      }
+    })();
+    return initPromiseV3;
   }
-
-  isInitializing = true;
-  initPromise = (async () => {
-    console.log('Initializing PaddleOCR Service (downloading models if not cached)...');
-    try {
-      const service = new PaddleOcrService({
-        detection: {
-          maxSideLength: 2000 // Prevents downscaling of high-resolution pages/images
-        }
-      });
-      await service.initialize();
-      ocrServiceInstance = service;
-      console.log('PaddleOCR Service successfully initialized and warmed up.');
-      return ocrServiceInstance;
-    } catch (error) {
-      console.error('Failed to initialize PaddleOCR Service:', error);
-      isInitializing = false;
-      initPromise = null;
-      throw error;
-    }
-  })();
-
-  return initPromise;
 }
 
 /**
@@ -70,9 +110,10 @@ function getEncompassingBox(words) {
 /**
  * Executes OCR text and layout detection on an image.
  * @param {string|Buffer|ArrayBuffer} imageInput File path or buffer of the target image
+ * @param {string} model 'v3' | 'v6'
  */
-export async function performOcr(imageInput) {
-  const service = await initOcrService();
+export async function performOcr(imageInput, model = 'v3') {
+  const service = await initOcrService(model);
   try {
     const result = await service.recognize(imageInput);
     
@@ -94,7 +135,7 @@ export async function performOcr(imageInput) {
       lines
     };
   } catch (error) {
-    console.error('OCR processing failed:', error);
+    console.error(`OCR processing failed using model ${model}:`, error);
     throw error;
   }
 }
