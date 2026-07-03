@@ -1,0 +1,6 @@
+node_modules/
+uploads/
+jobs_db.json
+.env
+models/
+*.log
