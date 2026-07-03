@@ -1,6 +1,7 @@
 export { PaddleOcrService } from "./paddle-ocr.service.js";
 export { DetectionService } from "./detection.service.js";
 export { RecognitionService } from "./recognition.service.js";
+export { ModelManager } from "./model-manager.js";
 export {
   DEFAULT_CHARACTERS_DICTIONARY_PATH,
   DEFAULT_DEBUGGING_OPTIONS,

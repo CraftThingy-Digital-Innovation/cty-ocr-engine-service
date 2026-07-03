@@ -1,5 +1,5 @@
 import * as ort from "onnxruntime-node";
-import { Canvas, CanvasToolkit, ImageProcessor } from "./ppu-ocv/index.js";
+import { Canvas, CanvasToolkit, ImageProcessor } from "./cty-ocv/index.js";
 import { DEFAULT_DEBUGGING_OPTIONS, DEFAULT_RECOGNITION_OPTIONS } from "./constants.js";
 
 export class RecognitionService {

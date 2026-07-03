@@ -1,5 +1,5 @@
 import * as ort from "onnxruntime-node";
-import { Canvas, CanvasToolkit, Contours, createCanvas, cv, ImageProcessor } from "./ppu-ocv/index.js";
+import { Canvas, CanvasToolkit, Contours, createCanvas, cv, ImageProcessor } from "./cty-ocv/index.js";
 import { DEFAULT_DEBUGGING_OPTIONS, DEFAULT_DETECTION_OPTIONS } from "./constants.js";
 
 export class DetectionService {

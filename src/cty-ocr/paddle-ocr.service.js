@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import * as path from "path";
 import * as ort from "onnxruntime-node";
-import { ImageProcessor } from "./ppu-ocv/index.js";
+import { ImageProcessor } from "./cty-ocv/index.js";
 import { DEFAULT_PADDLE_OPTIONS } from "./constants.js";
 import { DetectionService } from "./detection.service.js";
 import { RecognitionService } from "./recognition.service.js";
