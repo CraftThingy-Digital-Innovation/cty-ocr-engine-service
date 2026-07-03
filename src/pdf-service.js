@@ -30,7 +30,7 @@ export async function convertPdfPageToImage(pdfPath, pageNum) {
     // Render single page to base64 Data URL
     const dataUrl = await pdfToImg(pdfPath, {
       pages: pageNum,
-      scale: 1.5 // 1.5 scale is high-quality enough for OCR
+      scale: 2.5 // 2.5 scale increases resolution for high OCR accuracy
     });
 
     if (!dataUrl || typeof dataUrl !== 'string') {

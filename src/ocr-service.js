@@ -19,7 +19,11 @@ export async function initOcrService() {
   initPromise = (async () => {
     console.log('Initializing PaddleOCR Service (downloading models if not cached)...');
     try {
-      const service = new PaddleOcrService();
+      const service = new PaddleOcrService({
+        detection: {
+          maxSideLength: 2000 // Prevents downscaling of high-resolution pages/images
+        }
+      });
       await service.initialize();
       ocrServiceInstance = service;
       console.log('PaddleOCR Service successfully initialized and warmed up.');
